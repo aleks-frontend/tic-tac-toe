@@ -1,12 +1,12 @@
-const Square = props => (
+const Square = ({ gameOver ,highlight, onClick, value }) => (
     <button
         style={{ 
-            cursor: props.gameOver ? 'auto' : 'pointer',
-            color: props.highlight ? 'red' : 'black'
+            cursor: gameOver ? 'auto' : 'pointer',
+            color: highlight ? 'red' : 'black'
         }}
         className="square"
-        onClick={props.onClick}>
-        {props.value}
+        onClick={onClick}>
+        {value}
     </button>
 );
 
