@@ -1,14 +1,13 @@
 import Square from './Square';
 
-const Board = ({ squares, gameOver, onClick, winningCombination }) => {
+const Board = ({ squares, onClick }) => {
     let squareIndex = 0;
 
     const renderSquare = i => (
         <Square
             key={i}
+            index={i}
             value={squares[i]}
-            gameOver={gameOver}
-            highlight={winningCombination.includes(i) && gameOver}
             onClick={() => onClick(i)}
         />
     );

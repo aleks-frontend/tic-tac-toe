@@ -1,23 +1,36 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import { calculateWinner, getMoveCoordinates } from '../helpers';
 import Board from './Board';
 import Move from './Move';
+import { HistoryContext } from '../contexts/HistoryContext';
+import { GameOverContext } from '../contexts/GameOverContext';
+import { WinningCombinationContext } from '../contexts/WinningCombinationContext';
 
 const Game = () => {
-    const [history, setHistory] = useState([{
-        squares: Array(9).fill(null),
-        moveIndex: 0,
-        clickedCords: null
-    }]);
-    const [winningCombination, setWinningCombination] = useState([]);
+    // Importing 3 global states from Context
+    const { history, setHistory } = useContext(HistoryContext);
+    const { setGameOver } = useContext(GameOverContext);
+    const { winningCombination, setWinningCombination } = useContext(WinningCombinationContext);
+    // Defining local states
     const [movesOrder, setMovesOrder] = useState('asc');
     const [stepNumber, setStepNumber] = useState(0);
     const [xIsNext, setXIsNext] = useState(true);
-    const [gameOver, setGameOver] = useState(false);
     const current = history[stepNumber];
     // Checking for winner after each render
     const winner = calculateWinner(current.squares);
+
+    useEffect(() => {
+        if (winningCombination.length === 0 && winner) {
+            setWinningCombination(winner.indexes)            
+        }
+    }, [history]);
+    
+    useEffect(() => {
+        if (winningCombination.length) {
+            setWinningCombination([])
+        }
+    }, [stepNumber])
 
     // Controling the time travel
     const jumpTo = (step) => {
@@ -30,9 +43,6 @@ const Game = () => {
     // Showing which player goes next or the winner of the game
     const renderStatus = () => {
         if (winner) {
-            if (winningCombination.length === 0)
-                setWinningCombination(winner.indexes)
-
             return `
                 Winner: ${winner.sign}
                 Combination: ${winner.indexes}
@@ -40,9 +50,6 @@ const Game = () => {
         } else if (!current.squares.some(square => square === null)) {
             return `Game is a draw!`;
         } else {
-            if (winningCombination.length)
-                setWinningCombination([])
-
             return `Next player: ${xIsNext ? 'X' : 'O'}`;
         }
     };
@@ -96,8 +103,6 @@ const Game = () => {
             <div className="game-board">
                 <Board
                     squares={current.squares}
-                    winningCombination={winningCombination}
-                    gameOver={gameOver}
                     onClick={(i) => handleSquareClick(i)}
                 />
             </div>
